@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Teacher Dashboard</h2>
+
+<div class="card shadow-sm p-3 mb-4">
+  <h5>Create New Task</h5>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success mt-2">Create Task</button>
+  </form>
+</div>
+
+<h4>Assigned Tasks</h4>
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Student</th>
+      <th>Status</th>
+      <th>Deadline</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tasks %}
+      <tr>
+        <td>{{ t.title }}</td>
+        <td>{{ t.assigned_to.username }}</td>
+        <td>{{ t.get_status_display }}</td>
+        <td>{{ t.deadline }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No tasks yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

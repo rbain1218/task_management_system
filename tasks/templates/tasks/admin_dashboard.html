@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="fw-bold text-primary">Admin Dashboard</h2>
+  <a href="{% url 'register' %}" class="btn btn-primary">
+    Create New User
+  </a>
+</div>
+
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+
+<div class="row mb-4">
+  <div class="col-md-6 col-lg-4 mb-3">
+    <div class="card shadow-sm border-0 p-3 text-center">
+      <h5 class="fw-bold text-secondary">Total Users</h5>
+      <h2 class="text-dark">{{ users|length }}</h2>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4 mb-3">
+    <div class="card shadow-sm border-0 p-3 text-center">
+      <h5 class="fw-bold text-secondary">Total Tasks</h5>
+      <h2 class="text-dark">{{ tasks|length }}</h2>
+    </div>
+  </div>
+</div>
+
+
+<div class="card shadow-sm border-0 p-3 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="fw-bold mb-0">All Users</h5>
+    <span class="badge bg-primary">{{ users|length }} total</span>
+  </div>
+
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>
+          {% if u.role == 'admin' %}
+            <span class="badge bg-danger">Admin</span>
+          {% elif u.role == 'teacher' %}
+            <span class="badge bg-info text-dark">Teacher</span>
+          {% else %}
+            <span class="badge bg-success">Student</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if u.role != 'admin' %}
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" name="delete_user" value="{{ u.id }}" class="btn btn-sm btn-outline-danger">
+              Delete
+            </button>
+          </form>
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-center text-muted">No users found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="card shadow-sm border-0 p-3 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="fw-bold mb-0">All Tasks</h5>
+    <span class="badge bg-secondary">{{ tasks|length }} total</span>
+  </div>
+
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Title</th>
+        <th>Created By</th>
+        <th>Assigned To</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tasks %}
+      <tr>
+        <td>{{ t.title }}</td>
+        <td>{{ t.created_by.username }}</td>
+        <td>{{ t.assigned_to.username }}</td>
+        <td>
+          {% if t.status == 'pending' %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% elif t.status == 'in_progress' %}
+            <span class="badge bg-info text-dark">In Progress</span>
+          {% else %}
+            <span class="badge bg-success">Completed</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" name="delete_task" value="{{ t.id }}" class="btn btn-sm btn-outline-danger">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No tasks found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="text-center text-muted mt-3">
+  <small>© 2025 Task Management System</small>
+</div>
+{% endblock %}

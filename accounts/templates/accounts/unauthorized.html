@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Access Denied{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+  <div class="alert alert-danger shadow-sm d-inline-block p-4">
+    <h3>Access Denied</h3>
+    <p>You are not authorized to view this page.</p>
+    <a href="{% url 'login' %}" class="btn btn-outline-dark mt-3">Go Back to Login</a>
+  </div>
+</div>
+{% endblock %}
