@@ -6,21 +6,23 @@ from .forms import RegisterForm
 from .models import User
 
 
-@login_required
 def register(request):
-    # Only admin can register new users
-    if request.user.role != 'admin':
-        messages.error(request, " Only admin can create new users.")
-        return redirect('unauthorized')
-
+    
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            messages.success(request, f" User '{user.username}' created successfully!")
-            return redirect('admin_dashboard')
+            new_user = form.save(commit=False)
+            new_user.role = 'student'  # default role
+            new_user.is_active = False  # wait for admin approval
+            new_user.save()
+
+            messages.info(
+                request,
+                "Your registration request has been submitted. Please wait for admin approval."
+            )
+            return redirect('login')
         else:
-            messages.error(request, "Please check the form — something went wrong.")
+            messages.error(request, "Please correct the form errors.")
     else:
         form = RegisterForm()
 
@@ -32,14 +34,18 @@ def login_view(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
+
         if user:
-            login(request, user)
-            if user.role == 'admin':
-                return redirect('admin_dashboard')
-            elif user.role == 'teacher':
-                return redirect('teacher_dashboard')
+            if user.is_active:
+                login(request, user)
+                if user.role == 'admin':
+                    return redirect('admin_dashboard')
+                elif user.role == 'teacher':
+                    return redirect('teacher_dashboard')
+                elif user.role == 'student':
+                    return redirect('student_dashboard')
             else:
-                return redirect('student_dashboard')
+                messages.warning(request, " Your account is pending admin approval.")
         else:
             messages.error(request, " Invalid username or password.")
     return render(request, 'accounts/login.html')
@@ -48,7 +54,7 @@ def login_view(request):
 @login_required
 def logout_view(request):
     logout(request)
-    messages.success(request, " You’ve been logged out successfully.")
+    messages.success(request, "You’ve been logged out successfully.")
     return redirect('login')
 
 
