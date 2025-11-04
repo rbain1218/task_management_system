@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Verify OTP{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="card shadow-sm p-4 text-center">
+
+      <h3 class="mb-3">Verify Your Email</h3>
+      <p>An OTP has been sent to your email. Please enter it below.</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="text" name="otp" class="form-control" placeholder="Enter OTP" required>
+        <button class="btn btn-success mt-3 w-100">Verify</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
